@@ -544,35 +544,27 @@ class ImagePainterState extends State<ImagePainter> {
     return Container(
       height: widget.height ?? double.maxFinite,
       width: widget.width ?? double.maxFinite,
-      child: Column(
-        children: [
-          Expanded(
-            child: ClipRect(
-              child: AnimatedBuilder(
-                animation: _controller,
-                builder: (context, child) {
-                  return InteractiveViewer(
-                    transformationController: _transformationController,
-                    maxScale: 2.4,
-                    minScale: 1,
-                    panEnabled: _controller.mode == PaintMode.none,
-                    scaleEnabled: widget.isScalable!,
-                    onInteractionUpdate: _scaleUpdateGesture,
-                    onInteractionEnd: _scaleEndGesture,
-                    child: CustomPaint(
-                      size: imageSize,
-                      willChange: true,
-                      isComplex: true,
-                      painter: DrawImage(
-                        controller: _controller,
-                      ),
-                    ),
-                  );
-                },
+      child: AnimatedBuilder(
+        animation: _controller,
+        builder: (context, child) {
+          return InteractiveViewer(
+            transformationController: _transformationController,
+            maxScale: 2.4,
+            minScale: 1,
+            panEnabled: _controller.mode == PaintMode.none,
+            scaleEnabled: widget.isScalable!,
+            onInteractionUpdate: _scaleUpdateGesture,
+            onInteractionEnd: _scaleEndGesture,
+            child: CustomPaint(
+              size: imageSize,
+              willChange: true,
+              isComplex: true,
+              painter: DrawImage(
+                controller: _controller,
               ),
             ),
-          ),
-        ],
+          );
+        },
       ),
     );
   }
