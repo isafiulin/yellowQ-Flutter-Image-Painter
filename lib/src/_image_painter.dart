@@ -48,7 +48,7 @@ class DrawImage extends CustomPainter {
         case PaintMode.circle:
           final path = Path();
           path.addOval(
-            Rect.fromCircle(center: _offset[1]!, radius: 20),
+            Rect.fromCircle(center: _offset[1]!, radius: _controller.radius),
           );
           canvas.drawPath(path, _painter);
           break;
@@ -117,7 +117,8 @@ class DrawImage extends CustomPainter {
           break;
         case PaintMode.circle:
           final path = Path();
-          path.addOval(Rect.fromCircle(center: _end!, radius: 20));
+          path.addOval(
+              Rect.fromCircle(center: _end!, radius: _controller.radius));
           canvas.drawPath(path, _paint);
           break;
         case PaintMode.arrow:

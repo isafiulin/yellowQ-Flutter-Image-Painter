@@ -13,6 +13,8 @@ class ImagePainterController extends ChangeNotifier {
   late String _text;
   late bool _fill;
   late ui.Image? _image;
+  late double _radius;
+
   Rect _rect = Rect.zero;
 
   final List<Offset?> _offsets = [];
@@ -42,6 +44,8 @@ class ImagePainterController extends ChangeNotifier {
 
   bool get fill => _fill;
 
+  double get radius => _radius;
+
   Color get color => _color;
 
   List<PaintInfo> get paintHistory => _paintHistory;
@@ -64,12 +68,14 @@ class ImagePainterController extends ChangeNotifier {
     PaintMode mode = PaintMode.freeStyle,
     String text = '',
     bool fill = false,
+    double radius = 20,
   }) {
     _strokeWidth = strokeWidth;
     _color = color;
     _mode = mode;
     _text = text;
     _fill = fill;
+    _radius = radius;
   }
 
   void setImage(ui.Image image) {
