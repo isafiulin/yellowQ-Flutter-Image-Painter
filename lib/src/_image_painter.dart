@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'dart:ui';
 
 import 'package:flutter/material.dart' hide Image;
@@ -47,14 +48,15 @@ class DrawImage extends CustomPainter {
         case PaintMode.circle:
           final path = Path();
           path.addOval(
-            Rect.fromCircle(
-                center: _offset[1]!,
-                radius: (_offset[0]! - _offset[1]!).distance),
+            Rect.fromCircle(center: _offset[1]!, radius: 20),
           );
           canvas.drawPath(path, _painter);
           break;
         case PaintMode.arrow:
           drawArrow(canvas, _offset[0]!, _offset[1]!, _painter);
+          break;
+        case PaintMode.arrowDash:
+          drawArrowDash(canvas, _offset[0]!, _offset[1]!, _painter);
           break;
         case PaintMode.dashLine:
           final path = Path()
@@ -115,12 +117,14 @@ class DrawImage extends CustomPainter {
           break;
         case PaintMode.circle:
           final path = Path();
-          path.addOval(Rect.fromCircle(
-              center: _end!, radius: (_end - _start!).distance));
+          path.addOval(Rect.fromCircle(center: _end!, radius: 20));
           canvas.drawPath(path, _paint);
           break;
         case PaintMode.arrow:
           drawArrow(canvas, _start!, _end!, _paint);
+          break;
+        case PaintMode.arrowDash:
+          drawArrowDash(canvas, _start!, _end!, _paint);
           break;
         case PaintMode.dashLine:
           final path = Path()
@@ -157,6 +161,50 @@ class DrawImage extends CustomPainter {
       ..strokeWidth = painter.strokeWidth
       ..style = PaintingStyle.stroke;
     canvas.drawLine(start, end, painter);
+    final _pathOffset = painter.strokeWidth / 15;
+    final path = Path()
+      ..lineTo(-15 * _pathOffset, 10 * _pathOffset)
+      ..lineTo(-15 * _pathOffset, -10 * _pathOffset)
+      ..close();
+    canvas.save();
+    canvas.translate(end.dx, end.dy);
+    canvas.rotate((end - start).direction);
+    canvas.drawPath(path, arrowPainter);
+    canvas.restore();
+  }
+
+  void drawArrowDash(Canvas canvas, Offset start, Offset end, Paint painter) {
+    final arrowPainter = Paint()
+      ..color = painter.color
+      ..strokeWidth = painter.strokeWidth
+      ..style = PaintingStyle.stroke;
+
+    // Dash pattern: length of dash and space
+    const dashLength = 10.0;
+    const dashSpace = 5.0;
+    final totalDashLength = dashLength + dashSpace;
+
+    // Calculate the distance between start and end
+    final distance = (end - start).distance;
+
+    // Calculate the direction of the line
+    final direction = (end - start).direction;
+
+    // Loop to draw the dashed line
+    Offset currentPoint = start;
+    for (double drawnLength = 0;
+        drawnLength < distance;
+        drawnLength += totalDashLength) {
+      final nextPoint = currentPoint +
+          Offset(dashLength * cos(direction), dashLength * sin(direction));
+      // Draw a dash
+      canvas.drawLine(currentPoint, nextPoint, painter);
+      // Move to the next start point (skip the space)
+      currentPoint = nextPoint +
+          Offset(dashSpace * cos(direction), dashSpace * sin(direction));
+    }
+
+    // Draw the arrowhead
     final _pathOffset = painter.strokeWidth / 15;
     final path = Path()
       ..lineTo(-15 * _pathOffset, 10 * _pathOffset)
@@ -215,6 +263,7 @@ enum PaintMode {
 
   ///Allows us to draw line with arrow at the end point.
   arrow,
+  arrowDash,
 
   ///Allows to draw circle from a point.
   circle,
